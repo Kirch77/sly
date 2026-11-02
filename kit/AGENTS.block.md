@@ -32,8 +32,11 @@ The core of the job, always:
 
 - The **implementer** builds (`.sly/roles/implementer.md`). The **reviewer** checks with
   fresh eyes (`.sly/roles/reviewer.md`).
-- If you can start separate sub-agents, use them for these roles. If not, play them yourself
-  one after another, and review as if you had never seen the code (a fresh session if you can).
+- If you can start separate sub-agents, use them for these roles. In Claude Code with the sly
+  plugin, they are the `sly:implementer` and `sly:reviewer` agents, and the `sly:build` skill
+  runs the whole loop. Use it for any request to build, change or fix code. Without
+  sub-agents, play the roles yourself one after another, and review as if you had never seen
+  the code (a fresh session if you can).
 
 ## Every change
 

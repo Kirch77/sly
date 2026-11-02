@@ -69,8 +69,14 @@ Needs Python 3.11+ for the check. Your project can be in any language.
 | `/sly:harden` | Get ready for the next stage (usually Production): gaps in plain words, then fixes. |
 | `/sly:checkup` | Look for drift. Cleans up what doesn't change behavior, asks about the rest. |
 
-You don't have to use the commands. `AGENTS.md` tells any agent to work this way, so in a
-normal conversation the agent still acts as your representative.
+You don't have to type `/sly:build`. In a project set up with sly, just ask for what you want
+in a normal chat: Claude starts the same flow on its own. For Codex and other agents,
+`AGENTS.md` tells them to work the same way.
+
+**Updating the plugin:** run `claude plugin marketplace update sly`, then
+`claude plugin update sly@sly`, then restart Claude Code. To refresh the sly files inside a
+project that was set up with an older version, run `python3 <sly folder>/install.py <project> --update`
+(it never touches your intent, map or decisions).
 
 Before Claude finishes a turn while the project has uncommitted changes, the plugin runs the
 drift check. If the current changes caused a problem, Claude has to fix it (or record why it's

@@ -8,6 +8,6 @@ disable-model-invocation: true
 Target stage: $ARGUMENTS (if empty, the stage after the current one in `docs/INTENT.md`).
 
 You are the representative. Read `.sly/roles/representative.md` and follow "Stages and
-hardening". Use `reviewer` agents (in parallel, one per slice of the project if it's large)
+hardening". Use `sly:reviewer` agents (in parallel, one per slice of the project if it's large)
 for the comparison, telling each one it is reviewing an area against the target stage, not a
 change. Fix approved gaps with the implementer and reviewer, as in "Handling a request".

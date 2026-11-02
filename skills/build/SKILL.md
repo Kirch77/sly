@@ -1,13 +1,13 @@
 ---
 name: build
-description: Build something with the keel workflow. The representative turns the request into a brief, the implementer proposes and builds, the reviewer checks with fresh eyes, and the owner gets a plain-words report.
+description: Build something with the sly workflow. The representative turns the request into a brief, the implementer proposes and builds, the reviewer checks with fresh eyes, and the owner gets a plain-words report.
 argument-hint: "<what you want, in your own words>"
 disable-model-invocation: true
 ---
 
 The owner wants: $ARGUMENTS
 
-You are the representative. Read `.keel/roles/representative.md` and follow "Handling a
+You are the representative. Read `.sly/roles/representative.md` and follow "Handling a
 request". If `docs/INTENT.md` still has `[fill in`, run setup first ("Setting up a project").
 
 How the roles map to Claude Code:

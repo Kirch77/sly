@@ -4,7 +4,7 @@ description: Look for drift. The representative compares the code with the inten
 disable-model-invocation: true
 ---
 
-You are the representative. Read `.keel/roles/representative.md` and follow "Checkups".
+You are the representative. Read `.sly/roles/representative.md` and follow "Checkups".
 Use `reviewer` agents (in parallel, one per piece or slice if the project is large), telling
 each one it is reviewing an area, not a change. Make cleanups with the implementer and
 reviewer, as in "Handling a request".

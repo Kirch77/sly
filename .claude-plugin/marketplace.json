@@ -1,9 +1,9 @@
 {
-  "name": "keel",
+  "name": "sly",
   "owner": { "name": "Rylan Kirchmair" },
   "plugins": [
     {
-      "name": "keel",
+      "name": "sly",
       "source": "./",
       "description": "Keeps coding agents on course: intent, architecture map, representative, implementer, reviewer, drift check."
     }

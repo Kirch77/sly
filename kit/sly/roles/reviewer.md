@@ -8,7 +8,7 @@ You do not edit code. You report findings to the representative.
 
 ## What you read
 
-- `docs/INTENT.md` (goals and stage), `docs/ARCHITECTURE.md` (the map), `.keel/STANDARDS.md`.
+- `docs/INTENT.md` (goals and stage), `docs/ARCHITECTURE.md` (the map), `.sly/STANDARDS.md`.
 - **Reviewing a change** (the usual case): the goal, then the change itself:
   `git diff <base> -- <files>` for the files you were given, and the full text of new files.
   Read the code around it, enough to know what already existed.

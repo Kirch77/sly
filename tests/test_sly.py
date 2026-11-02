@@ -1,4 +1,4 @@
-"""End-to-end tests: install keel into throwaway projects and run the check.
+"""End-to-end tests: install sly into throwaway projects and run the check.
 
 Run: python3 -m unittest discover tests
 """
@@ -9,8 +9,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-KEEL = Path(__file__).resolve().parent.parent
-INSTALL = KEEL / "install.py"
+SLY = Path(__file__).resolve().parent.parent
+INSTALL = SLY / "install.py"
 
 INTENT = """# Intent
 **Stage:** MVP
@@ -20,7 +20,7 @@ A tiny calculator.
 
 MAP = """# Architecture
 Rules mention `path/` here, before the first section, which the check ignores.
-<!-- keel-ignore: vendor/ -->
+<!-- sly-ignore: vendor/ -->
 ## The pieces
 | Piece | Folder |
 |---|---|
@@ -40,7 +40,7 @@ def write(path: Path, text: str) -> None:
 
 
 class Project:
-    """A throwaway git project with keel installed."""
+    """A throwaway git project with sly installed."""
 
     def __init__(self, commit=True):
         self._tmp = tempfile.TemporaryDirectory()
@@ -50,7 +50,7 @@ class Project:
         sh(self.root, "git", "config", "user.name", "t")
         assert sh(self.root, sys.executable, str(INSTALL), ".").returncode == 0
         if commit:
-            self.commit("install keel")
+            self.commit("install sly")
 
     def set_up(self):
         write(self.root / "docs/INTENT.md", INTENT)
@@ -64,7 +64,7 @@ class Project:
         sh(self.root, "git", "commit", "-qm", message)
 
     def check(self, *args, stdin=None):
-        return sh(self.root, sys.executable, ".keel/check.py", *args, stdin=stdin)
+        return sh(self.root, sys.executable, ".sly/check.py", *args, stdin=stdin)
 
     def close(self):
         self._tmp.cleanup()
@@ -75,15 +75,15 @@ class InstallTests(unittest.TestCase):
         p = Project(commit=False)
         self.addCleanup(p.close)
         for rel in ["AGENTS.md", "CLAUDE.md", "docs/INTENT.md", "docs/ARCHITECTURE.md",
-                    "docs/DECISIONS.md", ".keel/STANDARDS.md", ".keel/check.py",
-                    ".keel/roles/representative.md"]:
+                    "docs/DECISIONS.md", ".sly/STANDARDS.md", ".sly/check.py",
+                    ".sly/roles/representative.md"]:
             self.assertTrue((p.root / rel).is_file(), rel)
         self.assertEqual((p.root / "CLAUDE.md").read_text(), "@AGENTS.md\n")
         result = p.check()
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("Setup isn't finished", result.stdout)
 
-    def test_keeps_existing_files_and_updates_only_keel_parts(self):
+    def test_keeps_existing_files_and_updates_only_sly_parts(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
@@ -94,21 +94,21 @@ class InstallTests(unittest.TestCase):
 
         agents = (root / "AGENTS.md").read_text()
         self.assertTrue(agents.startswith("# My own rules\nUse tabs.\n"))
-        self.assertIn("<!-- keel:start", agents)
+        self.assertIn("<!-- sly:start", agents)
         self.assertIn("@AGENTS.md", (root / "CLAUDE.md").read_text())
         self.assertEqual((root / "docs/INTENT.md").read_text(), "my intent")
 
-        # Local edits to keel's files survive a plain re-install, and --update refreshes them.
-        (root / ".keel/STANDARDS.md").write_text("old")
+        # Local edits to sly's files survive a plain re-install, and --update refreshes them.
+        (root / ".sly/STANDARDS.md").write_text("old")
         write(root / "AGENTS.md", agents.replace("# How to work in this project", "# stale"))
         sh(root, sys.executable, str(INSTALL), ".")
-        self.assertEqual((root / ".keel/STANDARDS.md").read_text(), "old")
+        self.assertEqual((root / ".sly/STANDARDS.md").read_text(), "old")
         out = sh(root, sys.executable, str(INSTALL), ".", "--update").stdout
-        self.assertIn("updated  .keel/STANDARDS.md", out)
+        self.assertIn("updated  .sly/STANDARDS.md", out)
         agents = (root / "AGENTS.md").read_text()
         self.assertIn("# How to work in this project", agents)
         self.assertTrue(agents.startswith("# My own rules"))
-        self.assertEqual(agents.count("<!-- keel:start"), 1)
+        self.assertEqual(agents.count("<!-- sly:start"), 1)
         self.assertEqual((root / "docs/INTENT.md").read_text(), "my intent")
         self.assertEqual((root / "CLAUDE.md").read_text().count("@AGENTS.md"), 1)
 
@@ -120,7 +120,7 @@ class MapTests(unittest.TestCase):
         self.p.set_up()
 
     def test_matching_map_passes(self):
-        write(self.p.root / "vendor/thing/x.c", "")  # ignored via keel-ignore
+        write(self.p.root / "vendor/thing/x.c", "")  # ignored via sly-ignore
         write(self.p.root / "tests/t.rs", "")         # tests don't need to be on the map
         result = self.p.check()
         self.assertEqual(result.returncode, 0, result.stdout)
@@ -244,8 +244,8 @@ class AuditRegressionTests(unittest.TestCase):
         result = self.p.check()
         self.assertIn("No new outside libraries", result.stdout)
 
-    def test_keel_ignore_in_template_format(self):
-        text = MAP.replace("<!-- keel-ignore: vendor/ -->", "<!-- keel-ignore: vendor/, gen/ -->")
+    def test_sly_ignore_in_template_format(self):
+        text = MAP.replace("<!-- sly-ignore: vendor/ -->", "<!-- sly-ignore: vendor/, gen/ -->")
         write(self.p.root / "docs/ARCHITECTURE.md", text)
         write(self.p.root / "gen/out.rs", "")
         result = self.p.check()
@@ -274,9 +274,9 @@ class AuditRegressionTests(unittest.TestCase):
         sh(repo, "git", "commit", "-qm", "init")
         sh(repo, "git", "checkout", "-qb", "feat")
         write(repo / "elsewhere.txt", "outside the project")
-        result = sh(repo, sys.executable, "proj/.keel/check.py")
+        result = sh(repo, sys.executable, "proj/.sly/check.py")
         self.assertIn("No new outside libraries", result.stdout)
-        hook = sh(repo, sys.executable, "proj/.keel/check.py", "--hook", stdin="{}")
+        hook = sh(repo, sys.executable, "proj/.sly/check.py", "--hook", stdin="{}")
         self.assertEqual(hook.returncode, 0)
 
     def test_hook_handles_odd_input(self):
@@ -297,7 +297,7 @@ class InstallerRegressionTests(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
-        original = "<!-- keel:start\nUSER NOTES\n"
+        original = "<!-- sly:start\nUSER NOTES\n"
         write(root / "AGENTS.md", original)
         out = sh(root, sys.executable, str(INSTALL), ".").stdout
         self.assertIn("SKIPPED  AGENTS.md", out)
@@ -311,10 +311,10 @@ class InstallerRegressionTests(unittest.TestCase):
         sh(root, sys.executable, str(INSTALL), ".")
         self.assertEqual((root / "CLAUDE.md").read_text(), "Read @./AGENTS.md first.\n")
 
-    def test_refuses_to_install_inside_keel(self):
-        result = sh(KEEL, sys.executable, str(INSTALL), str(KEEL / "kit" / "keel"))
+    def test_refuses_to_install_inside_sly(self):
+        result = sh(SLY, sys.executable, str(INSTALL), str(SLY / "kit" / "sly"))
         self.assertEqual(result.returncode, 1)
-        self.assertFalse((KEEL / "kit" / "keel" / ".keel").exists())
+        self.assertFalse((SLY / "kit" / "sly" / ".sly").exists())
 
 if __name__ == "__main__":
     unittest.main()

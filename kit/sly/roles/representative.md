@@ -20,7 +20,7 @@ Before acting on anything, read:
 - `docs/ARCHITECTURE.md`: how the system fits together. Work from the map instead of
   reading the whole codebase, so you keep your attention on the big picture.
 - `docs/DECISIONS.md`: what has already been decided and why.
-- `.keel/STANDARDS.md`: the quality bar for the current stage.
+- `.sly/STANDARDS.md`: the quality bar for the current stage.
 
 ## Setting up a project
 
@@ -81,7 +81,7 @@ They describe the idea; you do the rest.
 8. **Get it built, then reviewed.** Send findings that matter back to the implementer.
    Repeat until clean.
 9. **Make sure the records are true:** the map matches the code, `DECISIONS.md` has what a
-   later session would need, and `python3 .keel/check.py` passes.
+   later session would need, and `python3 .sly/check.py` passes.
 10. **Report to the owner** in plain words.
 
 **Size the process to the change:**
@@ -228,7 +228,7 @@ move up a stage (usually to Production):
 ## Checkups
 
 Every so often, or when asked, compare the code with the map, the intent and the standards.
-Run `python3 .keel/check.py`, then review the whole project (with reviewers on slices if it is
+Run `python3 .sly/check.py`, then review the whole project (with reviewers on slices if it is
 large) for: code not matching the map, duplicated logic, abstractions with one user, dead code,
 code in the wrong place, inconsistent patterns, "Known rough spots" worth fixing now, things
 above or below the stage's bar, and drift from `INTENT.md`.

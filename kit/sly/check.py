@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""keel check: catches drift that is easy to miss.
+"""sly check: catches drift that is easy to miss.
 
 It checks three things:
   1. Every new outside library is logged in docs/DECISIONS.md.
@@ -11,10 +11,10 @@ Only problems connected to the current changes (compared with the main branch) c
 It does not run tests or linters; the project's own tools do that.
 
 Usage:
-  python3 .keel/check.py              compare with the main branch
-  python3 .keel/check.py --base REF   compare with another branch or commit
-  python3 .keel/check.py --all        treat older problems as "to fix" too (for checkups)
-  python3 .keel/check.py --hook       Claude Code Stop hook mode (reads hook JSON on stdin)
+  python3 .sly/check.py              compare with the main branch
+  python3 .sly/check.py --base REF   compare with another branch or commit
+  python3 .sly/check.py --all        treat older problems as "to fix" too (for checkups)
+  python3 .sly/check.py --hook       Claude Code Stop hook mode (reads hook JSON on stdin)
 
 Exit code: 0 = all good, 1 = something to fix (2 in hook mode, which tells Claude to keep going).
 """
@@ -89,7 +89,7 @@ def find_base(explicit: str | None) -> tuple[str | None, str]:
     if explicit:
         sha = git("rev-parse", "--verify", explicit)
         if sha is None:
-            sys.exit(f"keel check: can't find '{explicit}' in git.")
+            sys.exit(f"sly check: can't find '{explicit}' in git.")
         return sha.strip(), explicit
     head = git("rev-parse", "--verify", "HEAD")
     if head is None:
@@ -347,7 +347,7 @@ def check_map(report: Report, files: list[str], changed: set[str] | None, strict
     body = map_body(map_text)
 
     ignored = [item.strip().strip("`").strip().rstrip("/")
-               for line in re.findall(r"^\s*<!--\s*keel-ignore:(.*?)(?:-->|$)", map_text, re.M)
+               for line in re.findall(r"^\s*<!--\s*sly-ignore:(.*?)(?:-->|$)", map_text, re.M)
                for item in line.split(",")]
     ignored = [i for i in ignored if i]
 
@@ -359,7 +359,7 @@ def check_map(report: Report, files: list[str], changed: set[str] | None, strict
     for folder in missing:
         if strict or touches(changed, folder):
             report.fix(f"Folder {folder}/ isn't on the map.",
-                       f"Add it to \"The pieces\" in {MAP}, or to keel-ignore if it isn't a piece.")
+                       f"Add it to \"The pieces\" in {MAP}, or to sly-ignore if it isn't a piece.")
         else:
             older += 1
 
@@ -374,7 +374,7 @@ def check_map(report: Report, files: list[str], changed: set[str] | None, strict
 
     if older:
         report.note(f"{older} older map problem{'s' if older > 1 else ''} not caused by these "
-                    "changes. Run with --all to see them, or use /keel:checkup.")
+                    "changes. Run with --all to see them, or use /sly:checkup.")
     elif not missing and not stale:
         report.ok("The map matches the folders in the project.")
 
@@ -394,20 +394,20 @@ def run(base_arg: str | None, strict: bool) -> tuple[Report, bool]:
     files = project_files()
     changed = changed_files(base)
 
-    report.lines.append(f"keel check | stage: {stage or 'not set'} | compared with {label}")
+    report.lines.append(f"sly check | stage: {stage or 'not set'} | compared with {label}")
     check_libraries(report, files, base)
     if set_up:
         check_map(report, files, changed, strict)
     else:
         report.note(f"Setup isn't finished ({INTENT} has blanks), so the map wasn't checked. "
-                    "Run /keel:start or follow the representative's setup steps.")
+                    "Run /sly:start or follow the representative's setup steps.")
     if stage and stage.lower() == "explore":
         report.note("Stage is Explore: this code is throwaway. Don't build on it.")
     return report, set_up
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="keel drift check")
+    parser = argparse.ArgumentParser(description="sly drift check")
     parser.add_argument("--base", help="branch or commit to compare with (default: main)")
     parser.add_argument("--all", action="store_true", help="count older problems too")
     parser.add_argument("--hook", action="store_true", help="Claude Code Stop hook mode")

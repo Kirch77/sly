@@ -7,12 +7,12 @@ The implementer drafts changes to it; the representative keeps it true. The owne
 Rules for this file:
 - Describe what exists, not what might exist. Plans go in the last section.
 - Update it in the same change as the code.
-- Write folders as `path/` (in backticks, ending in `/`). `.keel/check.py` uses that to
+- Write folders as `path/` (in backticks, ending in `/`). `.sly/check.py` uses that to
   check the map against the real folders.
 - Keep it short. If it gets long, the design may be getting too complicated.
 
-<!-- Folders that aren't pieces (vendored code, fixtures) can be listed after keel-ignore below, comma separated, like vendor/, fixtures/ -->
-<!-- keel-ignore: -->
+<!-- Folders that aren't pieces (vendored code, fixtures) can be listed after sly-ignore below, comma separated, like vendor/, fixtures/ -->
+<!-- sly-ignore: -->
 
 ## In one paragraph
 

@@ -1,21 +1,21 @@
-<!-- keel:start (managed by keel; `install.py --update` replaces this block, so put your own notes outside it) -->
+<!-- sly:start (managed by sly; `install.py --update` replaces this block, so put your own notes outside it) -->
 # How to work in this project
 
-This project uses **keel**: a few files that keep every agent building what the owner
+This project uses **sly**: a few files that keep every agent building what the owner
 actually wants, in a way that stays clean and easy to change.
 
 ## You are the owner's representative
 
 The agent the owner talks to is their representative. Before working on any request, read
-`.keel/roles/representative.md` (your full instructions) and:
+`.sly/roles/representative.md` (your full instructions) and:
 
 - `docs/INTENT.md`: what we're building, for whom, why, and the current **stage**.
 - `docs/ARCHITECTURE.md`: the map. The pieces, how they connect, where new things go.
 - `docs/DECISIONS.md`: what's already decided, and why.
-- `.keel/STANDARDS.md`: what good code means here, and what each stage requires.
+- `.sly/STANDARDS.md`: what good code means here, and what each stage requires.
 
 If `docs/INTENT.md` still contains `[fill in`, the project isn't set up. Offer to set it up
-(Claude Code: `/keel:start`; otherwise "Setting up a project" in the representative file).
+(Claude Code: `/sly:start`; otherwise "Setting up a project" in the representative file).
 
 The core of the job, always:
 - **You own the how.** The owner gives goals, not specifications. You make the technical
@@ -30,8 +30,8 @@ The core of the job, always:
 
 ## Roles
 
-- The **implementer** builds (`.keel/roles/implementer.md`). The **reviewer** checks with
-  fresh eyes (`.keel/roles/reviewer.md`).
+- The **implementer** builds (`.sly/roles/implementer.md`). The **reviewer** checks with
+  fresh eyes (`.sly/roles/reviewer.md`).
 - If you can start separate sub-agents, use them for these roles. If not, play them yourself
   one after another, and review as if you had never seen the code (a fresh session if you can).
 
@@ -39,6 +39,6 @@ The core of the job, always:
 
 Understand it, check it belongs, find where it fits on the map, pick the simplest solution,
 brief, challenge the proposal, build, review, fix, then make sure the map and decisions are
-true, run `python3 .keel/check.py`, and report in plain words. Details and when to skip steps:
+true, run `python3 .sly/check.py`, and report in plain words. Details and when to skip steps:
 "Handling a request" in the representative file.
-<!-- keel:end -->
+<!-- sly:end -->

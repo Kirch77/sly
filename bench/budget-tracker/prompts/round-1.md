@@ -1,0 +1,1 @@
+Build a command-line budget tracker in Python. I want to add expenses (amount, category, note, date), list them, and see a monthly summary by category. Store data in a local file. It's just for me, should work offline, and should stay simple.

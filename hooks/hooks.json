@@ -1,6 +1,18 @@
 {
-  "description": "Before Claude finishes, run the sly drift check (if the project has sly installed).",
+  "description": "When a session starts, refresh the project's sly files if the plugin is newer. Before Claude finishes, run the sly drift check.",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "d=\"${CLAUDE_PROJECT_DIR}\"; [ -d \"$d/.sly\" ] || exit 0; command -v python3 >/dev/null || exit 0; python3 \"${CLAUDE_PLUGIN_ROOT}/install.py\" \"$d\" --auto || true",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

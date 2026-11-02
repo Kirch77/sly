@@ -73,10 +73,14 @@ You don't have to type `/sly:build`. In a project set up with sly, just ask for 
 in a normal chat: Claude starts the same flow on its own. For Codex and other agents,
 `AGENTS.md` tells them to work the same way.
 
-**Updating the plugin:** run `claude plugin marketplace update sly`, then
-`claude plugin update sly@sly`, then restart Claude Code. To refresh the sly files inside a
-project that was set up with an older version, run `python3 <sly folder>/install.py <project> --update`
-(it never touches your intent, map or decisions).
+**Updating:** turn on auto-update once. In Claude Code run `/plugin`, open the
+**Marketplaces** tab, select **sly**, and choose **Enable auto-update**. After that, new
+versions install by themselves (they load the next time you start Claude Code). Each project's
+sly files refresh automatically when you open the project, so there's nothing else to run.
+Your intent, map and decisions are never touched.
+
+To update by hand instead: run `/plugin`, open **Marketplaces**, select **sly**, and choose
+**Update marketplace**, then restart Claude Code.
 
 Before Claude finishes a turn while the project has uncommitted changes, the plugin runs the
 drift check. If the current changes caused a problem, Claude has to fix it (or record why it's
@@ -97,7 +101,8 @@ docs/
   check.py             the drift check                                          (sly's)
 ```
 
-"Yours" files are never overwritten. To get a newer version of sly's files:
+"Yours" files are never overwritten. With the plugin, sly's own files refresh automatically
+when you open the project in Claude Code. Without it (Codex, other agents), refresh them with:
 
 ```bash
 python3 ~/tools/sly/install.py ~/path/to/project --update
@@ -134,6 +139,11 @@ It doesn't run your tests or linters. Keep using your project's own tools for th
 
 After 5 to 10 real changes, look at what the reviewer kept catching and what you had to fix
 by hand. Turn repeated problems into rules or checks, and delete rules that never matter.
+
+## Testing how well it works
+
+`bench/budget-tracker/` is a ready-made comparison: build the same small app with sly and with
+plain Claude Code, then score both. See its README.
 
 ## Developing sly
 

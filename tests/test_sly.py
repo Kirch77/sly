@@ -316,5 +316,56 @@ class InstallerRegressionTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertFalse((SLY / "kit" / "sly" / ".sly").exists())
 
+
+class AutoRefreshTests(unittest.TestCase):
+    """The plugin runs `install.py --auto` when a session starts."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+
+    def auto(self):
+        return sh(self.root, sys.executable, str(INSTALL), str(self.root), "--auto")
+
+    def test_ignores_projects_without_sly(self):
+        result = self.auto()
+        self.assertEqual((result.returncode, result.stdout), (0, ""))
+        self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_refreshes_older_projects_without_touching_owner_files(self):
+        sh(self.root, sys.executable, str(INSTALL), ".")
+        (self.root / ".sly/VERSION").write_text("0.0.1\n")
+        (self.root / ".sly/STANDARDS.md").write_text("old")
+        (self.root / ".sly/roles/reviewer.md").unlink()       # a file new in this version
+        (self.root / "docs/DECISIONS.md").unlink()            # owner deleted it on purpose
+        (self.root / "CLAUDE.md").write_text("# mine\n")      # owner removed the import
+        result = self.auto()
+        self.assertIn("refreshed this project's sly files from 0.0.1", result.stdout)
+        self.assertNotEqual((self.root / ".sly/STANDARDS.md").read_text(), "old")
+        self.assertTrue((self.root / ".sly/roles/reviewer.md").exists())
+        self.assertFalse((self.root / "docs/DECISIONS.md").exists())
+        self.assertEqual((self.root / "CLAUDE.md").read_text(), "# mine\n")
+        self.assertEqual(self.auto().stdout, "")  # now current: nothing to do
+
+    def test_never_downgrades(self):
+        sh(self.root, sys.executable, str(INSTALL), ".")
+        (self.root / ".sly/VERSION").write_text("99.0.0\n")
+        (self.root / ".sly/STANDARDS.md").write_text("from a newer sly")
+        self.assertEqual(self.auto().stdout, "")
+        self.assertEqual((self.root / ".sly/STANDARDS.md").read_text(), "from a newer sly")
+
+    def test_hook_command_runs_from_the_plugin(self):
+        sh(self.root, sys.executable, str(INSTALL), ".")
+        (self.root / ".sly/VERSION").write_text("0.0.1\n")
+        (self.root / ".sly/STANDARDS.md").write_text("old")
+        hooks = json.loads((SLY / "hooks/hooks.json").read_text())
+        command = hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"]
+        command = command.replace("${CLAUDE_PROJECT_DIR}", str(self.root)) \
+                         .replace("${CLAUDE_PLUGIN_ROOT}", str(SLY))
+        result = subprocess.run(["sh", "-c", command], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("refreshed", result.stdout)
+
 if __name__ == "__main__":
     unittest.main()

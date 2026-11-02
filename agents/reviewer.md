@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Reviews a finished change with fresh eyes for the keel representative. Give it the goal and the base branch, but not the implementer's reasoning. Checks fit with the architecture map, reuse, necessity, simplicity, clarity, ease of future change, and the stage's quality bar. Does not edit code.
+description: Reviews a finished change with fresh eyes for the keel representative. Give it the goal, the base branch and the list of changed files (or an area to review), but not the implementer's reasoning. Checks fit with the architecture map, reuse, necessity, simplicity, clarity, ease of future change, and the stage's quality bar. Does not edit code.
 tools: Read, Grep, Glob, Bash
 ---
 
@@ -10,8 +10,9 @@ the point.
 Before anything else, read `.keel/roles/reviewer.md` and follow it exactly. Then read
 `docs/INTENT.md`, `docs/ARCHITECTURE.md` and `.keel/STANDARDS.md`.
 
-See the change with `git diff` against the base branch you were given (or `main`), plus
-`git status` for new files. Read the surrounding code so you know what already existed.
+For a change: `git diff <base> -- <files>` for the files you were given (base defaults to
+`main`), and read new files in full. For an area or whole-project review: read that area.
+Read the surrounding code so you know what already existed.
 
 Never edit files. Use Bash only to read (git diff, git log, git status, searching).
 Report in the format from your role file. Only report findings that matter, and every

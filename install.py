@@ -17,8 +17,16 @@ import sys
 from pathlib import Path
 
 KIT = Path(__file__).resolve().parent / "kit"
-BLOCK = re.compile(r"<!-- keel:start.*?<!-- keel:end -->\n?", re.S)
+START = re.compile(r"^<!-- keel:start", re.M)
+END = re.compile(r"^<!-- keel:end -->", re.M)
+BLOCK = re.compile(r"^<!-- keel:start.*?^<!-- keel:end -->\n?", re.S | re.M)
 CLAUDE_IMPORT = "@AGENTS.md"
+
+
+def imports_agents(text: str) -> bool:
+    """True if CLAUDE.md already imports AGENTS.md (outside code blocks)."""
+    text = re.sub(r"```.*?```", "", text, flags=re.S)
+    return re.search(r"(?<![\w/])@(\./)?AGENTS\.md\b", text) is not None
 
 
 def install(project: Path, update: bool) -> list[str]:
@@ -26,9 +34,9 @@ def install(project: Path, update: bool) -> list[str]:
 
     # keel's own files: .keel/ (refreshed by --update)
     for src in sorted((KIT / "keel").rglob("*")):
-        if src.is_dir():
-            continue
         rel = src.relative_to(KIT / "keel")
+        if src.is_dir() or any(p.startswith(".") or p == "__pycache__" for p in rel.parts):
+            continue
         dest = project / ".keel" / rel
         if not dest.exists():
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -59,7 +67,11 @@ def install(project: Path, update: bool) -> list[str]:
         log.append("added    AGENTS.md")
     else:
         text = agents.read_text(encoding="utf-8")
-        if not BLOCK.search(text):
+        starts, ends = len(START.findall(text)), len(END.findall(text))
+        if (starts, ends) not in ((0, 0), (1, 1)):
+            log.append("SKIPPED  AGENTS.md: it has broken or repeated keel markers. Fix them by hand "
+                       "(one '<!-- keel:start' line and one '<!-- keel:end -->' line), then rerun.")
+        elif not BLOCK.search(text):
             agents.write_text(text.rstrip() + "\n\n" + block, encoding="utf-8")
             log.append("updated  AGENTS.md (added the keel block at the end)")
         elif BLOCK.search(text).group(0) != block:
@@ -74,7 +86,7 @@ def install(project: Path, update: bool) -> list[str]:
     if not claude.exists():
         claude.write_text(CLAUDE_IMPORT + "\n", encoding="utf-8")
         log.append("added    CLAUDE.md (points Claude Code at AGENTS.md)")
-    elif not re.search(r"^@AGENTS\.md\s*$", claude.read_text(encoding="utf-8"), re.M):
+    elif not imports_agents(claude.read_text(encoding="utf-8")):
         text = claude.read_text(encoding="utf-8")
         claude.write_text(text.rstrip() + "\n\n" + CLAUDE_IMPORT + "\n", encoding="utf-8")
         log.append("updated  CLAUDE.md (added @AGENTS.md)")
@@ -92,8 +104,9 @@ def main() -> int:
     if not project.is_dir():
         print(f"Folder not found: {project}", file=sys.stderr)
         return 1
-    if project == KIT.parent:
-        print("That's the keel folder itself. Point the installer at your project.", file=sys.stderr)
+    if project == KIT.parent or KIT.parent in project.parents:
+        print("That's inside the keel folder itself. Point the installer at your project.",
+              file=sys.stderr)
         return 1
 
     log = install(project, args.update)

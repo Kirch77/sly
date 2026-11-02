@@ -41,6 +41,7 @@ Language, platform, tools, hosting, budget, anything fixed.
 
 ## Preferences
 
-How you like things done, if you have opinions: style, libraries you like or avoid, etc.
+How you like things done, if you have opinions: style, libraries you like or avoid, whether
+agents may make git commits, etc.
 
 - [fill in, or "none"]

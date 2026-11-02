@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${CLAUDE_PROJECT_DIR}/.keel/check.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\" --hook",
+            "command": "f=\"${CLAUDE_PROJECT_DIR}/.keel/check.py\"; [ -f \"$f\" ] || exit 0; command -v python3 >/dev/null || exit 0; exec python3 \"$f\" --hook",
             "timeout": 60
           }
         ]

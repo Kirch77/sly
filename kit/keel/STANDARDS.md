@@ -23,7 +23,7 @@ Go down this ladder and stop at the first step that works:
 - Put code where the map's "Where new things go" says. If nothing fits, raise it with the
   representative, who decides and updates the map. Do not invent a new place quietly.
 - Do it the way the map's "Patterns we use" says, even if you would personally do it another way.
-  Consistency beats local cleverness.
+  Consistency beats local cleverness. Never copy what the map lists under "Known rough spots".
 - Respect the rules about which piece may use which. Never reach into another piece's insides;
   use what it offers to the outside.
 

@@ -200,5 +200,121 @@ class HookTests(unittest.TestCase):
         self.assertEqual(again.returncode, 0)
 
 
+
+class AuditRegressionTests(unittest.TestCase):
+    """Bugs found in the audit. Each test is one bug that must stay fixed."""
+
+    def setUp(self):
+        self.p = Project()
+        self.addCleanup(self.p.close)
+        self.p.set_up()
+
+    def log(self, line):
+        with open(self.p.root / "docs/DECISIONS.md", "a") as f:
+            f.write(line + "\n")
+
+    def test_older_drift_is_a_note_not_a_block(self):
+        write(self.p.root / "legacy/x.py", "")
+        self.p.commit("old unmapped folder")
+        write(self.p.root / "NOTES.txt", "unrelated edit")
+        self.assertEqual(self.p.check("--hook", stdin="{}").returncode, 0)
+        result = self.p.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("1 older map problem", result.stdout)
+        self.assertEqual(self.p.check("--all").returncode, 1)
+        write(self.p.root / "legacy/y.py", "")  # touching it makes it this change's problem
+        self.assertEqual(self.p.check().returncode, 1)
+
+    def test_logging_needs_the_whole_name_in_an_entry(self):
+        write(self.p.root / "package.json", json.dumps({"dependencies": {"log": "1", "react": "1"}}))
+        self.log("- 2026-11-02 (representative): **Use `preact`.** Small.")
+        out = self.p.check().stdout
+        self.assertIn('"log"', out)    # "log" appears in the template text, but not in an entry
+        self.assertIn('"react"', out)  # "preact" is not "react"
+
+    def test_internal_packages_are_not_outside_libraries(self):
+        write(self.p.root / "package.json", json.dumps({"name": "@acme/web", "dependencies": {
+            "@acme/core": "workspace:*", "@acme/ui": "file:../ui"}}))
+        write(self.p.root / "Cargo.toml", '[package]\nname="app"\n[dependencies]\n'
+              'util = { path = "../util" }\nshared = { workspace = true }\n')
+        write(self.p.root / "pyproject.toml", '[project]\nname="myproj"\ndependencies=["myproj[x]"]\n')
+        write(self.p.root / "requirements.txt", "git+https://github.com/a/b.git\nfoo @ file:///x\n")
+        write(self.p.root / "go.mod", "module m\nrequire (\n\tgithub.com/x/dep v1 // indirect\n)\n")
+        write(self.p.root / "tests/fixtures/p/package.json", json.dumps({"dependencies": {"zzz": "1"}}))
+        result = self.p.check()
+        self.assertIn("No new outside libraries", result.stdout)
+
+    def test_keel_ignore_in_template_format(self):
+        text = MAP.replace("<!-- keel-ignore: vendor/ -->", "<!-- keel-ignore: vendor/, gen/ -->")
+        write(self.p.root / "docs/ARCHITECTURE.md", text)
+        write(self.p.root / "gen/out.rs", "")
+        result = self.p.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_map_ignores_paths_that_are_not_project_folders(self):
+        text = MAP.replace("## Planned", "Config lives in `~/.config/app/`, docs at "
+                           "`https://x.io/docs/`, shared code in `../shared/`, or `/usr/`.\n"
+                           "```\n`src/fake/`\n```\n| Lib | `./src/parser/` |\n## Planned")
+        write(self.p.root / "docs/ARCHITECTURE.md", text)
+        result = self.p.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_project_in_a_subfolder_of_a_repo(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        repo = Path(tmp.name)
+        sh(repo, "git", "init", "-q", "-b", "main")
+        sh(repo, "git", "config", "user.email", "t@t")
+        sh(repo, "git", "config", "user.name", "t")
+        proj = repo / "proj"
+        proj.mkdir()
+        sh(proj, sys.executable, str(INSTALL), ".")
+        write(proj / "package.json", json.dumps({"dependencies": {"lodash": "1"}}))
+        sh(repo, "git", "add", "-A")
+        sh(repo, "git", "commit", "-qm", "init")
+        sh(repo, "git", "checkout", "-qb", "feat")
+        write(repo / "elsewhere.txt", "outside the project")
+        result = sh(repo, sys.executable, "proj/.keel/check.py")
+        self.assertIn("No new outside libraries", result.stdout)
+        hook = sh(repo, sys.executable, "proj/.keel/check.py", "--hook", stdin="{}")
+        self.assertEqual(hook.returncode, 0)
+
+    def test_hook_handles_odd_input(self):
+        write(self.p.root / "src/eval/mod.rs", "")
+        for stdin in ["[]", "null", '"x"', ""]:
+            self.assertEqual(self.p.check("--hook", stdin=stdin).returncode, 2, stdin)
+
+    def test_nextjs_app_folder_is_one_piece(self):
+        write(self.p.root / "app/page.tsx", "")
+        write(self.p.root / "app/dashboard/page.tsx", "")
+        write(self.p.root / "docs/ARCHITECTURE.md", MAP.replace("## Planned", "| Web | `app/` |\n## Planned"))
+        result = self.p.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+
+class InstallerRegressionTests(unittest.TestCase):
+    def test_broken_markers_are_left_alone(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        original = "<!-- keel:start\nUSER NOTES\n"
+        write(root / "AGENTS.md", original)
+        out = sh(root, sys.executable, str(INSTALL), ".").stdout
+        self.assertIn("SKIPPED  AGENTS.md", out)
+        self.assertEqual((root / "AGENTS.md").read_text(), original)
+
+    def test_existing_import_forms_are_recognized(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        write(root / "CLAUDE.md", "Read @./AGENTS.md first.\n")
+        sh(root, sys.executable, str(INSTALL), ".")
+        self.assertEqual((root / "CLAUDE.md").read_text(), "Read @./AGENTS.md first.\n")
+
+    def test_refuses_to_install_inside_keel(self):
+        result = sh(KEEL, sys.executable, str(INSTALL), str(KEEL / "kit" / "keel"))
+        self.assertEqual(result.returncode, 1)
+        self.assertFalse((KEEL / "kit" / "keel" / ".keel").exists())
+
 if __name__ == "__main__":
     unittest.main()

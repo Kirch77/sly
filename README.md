@@ -72,8 +72,9 @@ Needs Python 3.11+ for the check. Your project can be in any language.
 You don't have to use the commands. `AGENTS.md` tells any agent to work this way, so in a
 normal conversation the agent still acts as your representative.
 
-Before Claude finishes a turn that changed files, the plugin runs the drift check. If it
-finds something, Claude has to fix it (or record why it's intentional) before stopping.
+Before Claude finishes a turn while the project has uncommitted changes, the plugin runs the
+drift check. If the current changes caused a problem, Claude has to fix it (or record why it's
+intentional) before stopping. Older problems never block; `/keel:checkup` handles those.
 
 ## What gets added to a project
 
@@ -110,6 +111,9 @@ It checks:
   `lib/`, `packages/`, `crates/` and similar. Folders that aren't pieces can go on the
   `keel-ignore` line in the map.
 - **Every folder the map mentions exists** (except under "Planned, not built yet").
+
+Only problems connected to the current changes count as "to fix". Older ones show as notes
+(`--all` counts them too). Reading `Cargo.toml` and `pyproject.toml` needs Python 3.11+.
 
 It doesn't run your tests or linters. Keep using your project's own tools for that, and add
 `python3 .keel/check.py` to CI next to them.

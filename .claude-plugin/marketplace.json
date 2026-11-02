@@ -1,0 +1,11 @@
+{
+  "name": "keel",
+  "owner": { "name": "Rylan Kirchmair" },
+  "plugins": [
+    {
+      "name": "keel",
+      "source": "./",
+      "description": "Keeps coding agents on course: intent, architecture map, representative, implementer, reviewer, drift check."
+    }
+  ]
+}

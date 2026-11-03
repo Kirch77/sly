@@ -1,5 +1,5 @@
 {
   "name": "sly",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Keeps coding agents on course: a representative that protects your intent, an implementer, a fresh-eyes reviewer, a living architecture map, and a drift check."
 }

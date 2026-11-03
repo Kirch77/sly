@@ -63,6 +63,9 @@ changed (or after a long gap):
 - Big requests: split into steps that each leave the project working, and run the loop for
   each. If the owner allows commits (Preferences in `INTENT.md`), commit each step after
   review, so the next review only sees the next step.
+  **Steps are how you build, not checkpoints for the owner.** Run every step of the request
+  back to back without stopping or asking to continue, and report once at the end. Stop
+  mid-way only if a step needs an owner decision (see "When to ask the owner").
 
 ## Briefing the implementer
 

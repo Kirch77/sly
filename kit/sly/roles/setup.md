@@ -25,13 +25,16 @@ for the owner: they describe the idea, you do the rest.
 4. **Draw the first map** in `docs/ARCHITECTURE.md`: only the pieces needed for the first
    working version. Later ideas go under "Planned, not built yet". The owner does not need to
    approve or edit the map.
-5. **Plan the thinnest working version:** one real feature working from start to finish
-   through every piece. It proves the shape early, while changing it is cheap. No empty
-   folders or layers "for later".
+5. **Plan the build order,** starting with the thinnest working version: one real feature
+   working from start to finish through every piece. It proves the shape early, while
+   changing it is cheap. No empty folders or layers "for later". The thin version is the
+   first step of the build, not something to deliver on its own.
 6. **Check in once** with a short plain summary: what you understood they want and why, the
-   approach you picked, and what you will build first. Ask "anything wrong or missing?". When
-   they say go, build everything from their first request with the normal loop, starting
-   with the thinnest version.
+   approach you picked, and the order you'll build it in. Ask "anything wrong or missing?".
+   When they say go, build **everything** from their first request with the normal loop.
+   Steps are how you build, not checkpoints for the owner: run them back to back without
+   stopping or asking to continue, and report once at the end. Stop mid-way only if a step
+   needs an owner decision (see "When to ask the owner" in `representative.md`).
 
 ## Existing project
 

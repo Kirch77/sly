@@ -18,6 +18,11 @@ Go down this ladder and stop at the first step that works:
 
 ## 2. Core rules (every stage)
 
+**Complete**
+- Build what the owner would expect, not only what they literally said: sensible defaults,
+  clear errors, new data showing up wherever related data already shows up, things that should
+  run unattended staying scriptable. A feature isn't done while it leaves gaps a user would hit.
+
 **Fit the system**
 - Read `docs/ARCHITECTURE.md` and the code you are about to touch before changing anything.
 - Put code where the map's "Where new things go" says. If nothing fits, raise it with the

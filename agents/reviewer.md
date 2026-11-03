@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Reviews a finished change with fresh eyes for the sly representative. Give it the goal, the base branch and the list of changed files (or an area to review), but not the implementer's reasoning. Checks fit with the architecture map, reuse, necessity, simplicity, clarity, ease of future change, and the stage's quality bar. Does not edit code.
+description: Reviews a finished change with fresh eyes for the sly representative. Give it the goal, the implied needs, the base branch and the list of changed files (or an area to review), but not the implementer's reasoning. Checks completeness and ripple effects, fit with the architecture map, reuse, simplicity, clarity, whether numbers mislead, look and feel, and the stage's quality bar. Does not edit code.
 tools: Read, Grep, Glob, Bash
 ---
 

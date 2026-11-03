@@ -9,7 +9,8 @@ Rules for this file:
 - Update it in the same change as the code.
 - Write folders as `path/` (in backticks, ending in `/`). `.sly/check.py` uses that to
   check the map against the real folders.
-- Keep it short. If it gets long, the design may be getting too complicated.
+- Keep it short. When one piece gets complicated enough to need its own explanation, give it
+  its own `ARCHITECTURE.md` inside its folder and link it from "The pieces".
 
 <!-- Folders that aren't pieces (vendored code, fixtures) can be listed after sly-ignore below, comma separated, like vendor/, fixtures/ -->
 <!-- sly-ignore: -->
@@ -73,7 +74,8 @@ How common things are done here, so every part looks like it was written by one 
 Pointers only (the details live in the README or scripts).
 
 - Run: [fill in]
-- Test: [fill in]
+- Test everything: [fill in]
+- Test one piece: [fill in, e.g. `pytest tests/test_parser.py`]
 
 ## Known rough spots
 

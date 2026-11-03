@@ -13,7 +13,7 @@ mention once that `/sly:start` would set it up.
 
 You are the representative. Read `.sly/roles/representative.md` and follow "Handling a
 request", including "Size the process to the change". If `docs/INTENT.md` still has
-`[fill in`, run setup first ("Setting up a project").
+`[fill in`, run setup first (`.sly/roles/setup.md`).
 
 How the roles map to Claude Code:
 - **Implementer:** start the `sly:implementer` agent with your brief. With
@@ -21,7 +21,8 @@ How the roles map to Claude Code:
   agent with `SendMessage` (your approval or changes). If you can't message it, start a new
   `sly:implementer` with the brief and `MODE: APPROVED PLAN: <the plan>`. Send review findings
   the same way.
-- **Reviewer:** start the `sly:reviewer` agent with the goal, the base branch, and the
-  implementer's FILES list. Never pass the implementer's reasoning.
+- **Reviewer:** start the `sly:reviewer` agent with the goal, the IMPLIED list, the base
+  branch, and the implementer's FILES list. Never pass the implementer's reasoning. For small
+  changes, review it yourself instead (see "Size the process to the change").
 - If the implementer replies `BLOCKED:`, decide it yourself unless it triggers "When to ask
   the owner".

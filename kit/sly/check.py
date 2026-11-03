@@ -5,6 +5,7 @@ It checks three things:
   1. Every new outside library is logged in docs/DECISIONS.md.
   2. Every code folder is on the map (docs/ARCHITECTURE.md).
   3. Every folder on the map still exists.
+It also notes code files that have grown large (a hint, never a failure).
 
 Only problems connected to the current changes (compared with the main branch) count as
 "to fix". Older problems are shown as notes, so nobody is blocked by drift they didn't cause.
@@ -44,6 +45,10 @@ CONTAINERS = {"src", "lib", "app", "apps", "packages", "crates", "internal", "cm
 # Folders that are never pieces, so they don't need to be on the map.
 NOT_PIECES = {"docs", "tests", "test", "spec", "__tests__", "examples", "example",
               "fixtures", "benches", "coverage", "out", "public", "assets"}
+# Code files longer than this get a note: they may be doing several jobs.
+LONG_FILE = 400
+CODE_EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".rs", ".go", ".java", ".kt",
+                   ".swift", ".rb", ".php", ".cs", ".c", ".cpp", ".h", ".vue", ".svelte"}
 # Skipped when walking a folder that isn't a git repository.
 JUNK = {"node_modules", "target", "dist", "build", "venv", "__pycache__"}
 
@@ -217,11 +222,15 @@ READERS = {"package.json": deps_package_json, "Cargo.toml": deps_cargo,
            "pyproject.toml": deps_pyproject, "go.mod": deps_go_mod}
 
 
+def in_skipped_folder(path: str) -> bool:
+    """True for files under tests, fixtures, examples, hidden or vendored folders."""
+    return any(p.startswith(".") or p in NOT_PIECES or p in JUNK for p in path.split("/")[:-1])
+
+
 def reader_for(path: str):
-    parts = path.split("/")
-    if any(p.startswith(".") or p in NOT_PIECES or p in JUNK for p in parts[:-1]):
-        return None  # test fixtures, examples, vendored copies
-    name = parts[-1]
+    if in_skipped_folder(path):
+        return None
+    name = path.rsplit("/", 1)[-1]
     if name.startswith("requirements") and name.endswith(".txt"):
         return deps_requirements
     return READERS.get(name)
@@ -379,6 +388,22 @@ def check_map(report: Report, files: list[str], changed: set[str] | None, strict
         report.ok("The map matches the folders in the project.")
 
 
+def check_file_sizes(report: Report, files: list[str], changed: set[str] | None, strict: bool) -> None:
+    """Notes long code files the current changes touched (all of them with --all)."""
+    long_files = []
+    for path in files:
+        if Path(path).suffix not in CODE_EXTENSIONS or in_skipped_folder(path):
+            continue
+        if not (strict or changed is None or path in changed):
+            continue
+        lines = read(path).count("\n")
+        if lines > LONG_FILE:
+            long_files.append(f"{path} ({lines} lines)")
+    if long_files:
+        report.note(f"Long code files: {', '.join(sorted(long_files))}. If one does several jobs, "
+                    "consider splitting it (the reviewer decides).")
+
+
 def stage_of(intent_text: str) -> str | None:
     match = re.search(r"\*\*Stage:\*\*\s*(Explore|MVP|Production)\b", intent_text, re.I)
     return match.group(1) if match else None
@@ -398,9 +423,10 @@ def run(base_arg: str | None, strict: bool) -> tuple[Report, bool]:
     check_libraries(report, files, base)
     if set_up:
         check_map(report, files, changed, strict)
+        check_file_sizes(report, files, changed, strict)
     else:
         report.note(f"Setup isn't finished ({INTENT} has blanks), so the map wasn't checked. "
-                    "Run /sly:start or follow the representative's setup steps.")
+                    "Run /sly:start or follow .sly/roles/setup.md.")
     if stage and stage.lower() == "explore":
         report.note("Stage is Explore: this code is throwaway. Don't build on it.")
     return report, set_up

@@ -76,7 +76,8 @@ class InstallTests(unittest.TestCase):
         self.addCleanup(p.close)
         for rel in ["AGENTS.md", "CLAUDE.md", "docs/INTENT.md", "docs/ARCHITECTURE.md",
                     "docs/DECISIONS.md", ".sly/STANDARDS.md", ".sly/check.py",
-                    ".sly/roles/representative.md"]:
+                    ".sly/roles/representative.md", ".sly/roles/setup.md",
+                    ".sly/roles/stages.md", ".sly/roles/checkup.md", ".sly/VERSION"]:
             self.assertTrue((p.root / rel).is_file(), rel)
         self.assertEqual((p.root / "CLAUDE.md").read_text(), "@AGENTS.md\n")
         result = p.check()
@@ -366,6 +367,25 @@ class AutoRefreshTests(unittest.TestCase):
         result = subprocess.run(["sh", "-c", command], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("refreshed", result.stdout)
+
+
+class LongFileTests(unittest.TestCase):
+    def setUp(self):
+        self.p = Project()
+        self.addCleanup(self.p.close)
+        self.p.set_up()
+
+    def test_notes_long_files_this_change_touched_without_failing(self):
+        write(self.p.root / "src/parser/old.rs", "x\n" * 500)
+        self.p.commit("an old long file")
+        write(self.p.root / "src/parser/new.rs", "x\n" * 450)
+        write(self.p.root / "tests/test_big.rs", "x\n" * 900)  # tests don't count
+        result = self.p.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("src/parser/new.rs (450 lines)", result.stdout)
+        self.assertNotIn("old.rs", result.stdout)
+        self.assertNotIn("test_big", result.stdout)
+        self.assertIn("old.rs (500 lines)", self.p.check("--all").stdout)
 
 if __name__ == "__main__":
     unittest.main()

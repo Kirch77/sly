@@ -86,6 +86,12 @@ Before Claude finishes a turn while the project has uncommitted changes, the plu
 drift check. If the current changes caused a problem, Claude has to fix it (or record why it's
 intentional) before stopping. Older problems never block; `/sly:checkup` handles those.
 
+## Pairs well with
+
+**frontend-design** (Anthropic's official plugin) for projects with screens: install it next to
+sly and the builder uses it automatically, following the "Look and feel" section that sly writes
+into your intent during setup.
+
 ## What gets added to a project
 
 ```

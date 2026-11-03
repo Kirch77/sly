@@ -39,6 +39,13 @@ Language, platform, tools, hosting, budget, anything fixed.
 
 - [fill in]
 
+## Look and feel
+
+Only for projects with screens people look at. How it should feel (calm, playful, serious,
+premium...), apps or sites to take inspiration from, and must-haves like dark mode or phone use.
+
+- [fill in, or "no screens"]
+
 ## Preferences
 
 How you like things done, if you have opinions: style, libraries you like or avoid, whether

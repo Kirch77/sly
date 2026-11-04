@@ -8,7 +8,8 @@
 
 Your project's files (docs/INTENT.md, docs/ARCHITECTURE.md, docs/DECISIONS.md, and anything
 outside the sly block in AGENTS.md) are never overwritten. --update only refreshes
-.sly/ (roles, standards, check) and the sly block in AGENTS.md.
+.sly/ (roles, standards, check), sly's Codex agents in .codex/agents/, and the sly block in
+AGENTS.md.
 """
 from __future__ import annotations
 
@@ -24,6 +25,8 @@ START = re.compile(r"^<!-- sly:start", re.M)
 END = re.compile(r"^<!-- sly:end -->", re.M)
 BLOCK = re.compile(r"^<!-- sly:start.*?^<!-- sly:end -->\n?", re.S | re.M)
 CLAUDE_IMPORT = "@AGENTS.md"
+# sly's own files: kit folder -> where it goes in a project. Refreshed by --update.
+OWNED = [("sly", ".sly"), ("codex-agents", ".codex/agents")]
 VERSION = json.loads((KIT.parent / ".claude-plugin" / "plugin.json").read_text())["version"]
 
 
@@ -45,22 +48,22 @@ def install(project: Path, update: bool, add_project_files: bool = True) -> list
     (.sly/ and an existing AGENTS.md block) are touched."""
     log: list[str] = []
 
-    # sly's own files: .sly/ (refreshed by --update)
-    for src in sorted((KIT / "sly").rglob("*")):
-        rel = src.relative_to(KIT / "sly")
-        if src.is_dir() or any(p.startswith(".") or p == "__pycache__" for p in rel.parts):
-            continue
-        dest = project / ".sly" / rel
-        if not dest.exists():
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dest)
-            log.append(f"added    .sly/{rel}")
-        elif dest.read_bytes() != src.read_bytes():
-            if update:
+    for kit_folder, target in OWNED:
+        for src in sorted((KIT / kit_folder).rglob("*")):
+            rel = src.relative_to(KIT / kit_folder)
+            if src.is_dir() or any(p.startswith(".") or p == "__pycache__" for p in rel.parts):
+                continue
+            dest, shown = project / target / rel, f"{target}/{rel.as_posix()}"
+            if not dest.exists():
+                dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dest)
-                log.append(f"updated  .sly/{rel}")
-            else:
-                log.append(f"kept     .sly/{rel} (differs; run with --update to refresh)")
+                log.append(f"added    {shown}")
+            elif dest.read_bytes() != src.read_bytes():
+                if update:
+                    shutil.copy2(src, dest)
+                    log.append(f"updated  {shown}")
+                else:
+                    log.append(f"kept     {shown} (differs; run with --update to refresh)")
     version_file = project / ".sly" / "VERSION"
     if update or not version_file.exists():
         version_file.write_text(VERSION + "\n", encoding="utf-8")

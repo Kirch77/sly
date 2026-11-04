@@ -1,0 +1,12 @@
+{
+  "name": "sly",
+  "interface": { "displayName": "sly" },
+  "plugins": [
+    {
+      "name": "sly",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Coding"
+    }
+  ]
+}

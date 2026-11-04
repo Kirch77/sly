@@ -111,6 +111,15 @@ session for the review if you can.) Then decide what gets fixed:
   it spreads through the code or the owner would realistically never hit it.
 - Matters of taste with no clear gain: skip, and do not let it loop.
 
+## Choosing the helper's model
+
+Helpers use the same model as you by default. Start a helper on the **strongest model
+available** when:
+- a helper has already failed at the same task twice, or
+- the task is designing the overall structure (a new project's architecture, a rescue's target).
+Mention it in one line in your report. If your tool doesn't let you choose a helper's model,
+tell the owner in your report that a stronger model might help.
+
 ## When to ask the owner
 
 The test: **would the owner notice or care about the result, and does their intent leave it

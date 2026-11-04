@@ -3,6 +3,8 @@
 Run: python3 -m unittest discover tests
 """
 import json
+import re
+import os
 import subprocess
 import sys
 import tempfile
@@ -78,7 +80,8 @@ class InstallTests(unittest.TestCase):
                     "docs/DECISIONS.md", ".sly/STANDARDS.md", ".sly/check.py",
                     ".sly/roles/representative.md", ".sly/roles/setup.md",
                     ".sly/roles/stages.md", ".sly/roles/checkup.md", ".sly/roles/rescue.md",
-                    ".sly/VERSION"]:
+                    ".sly/VERSION", ".codex/agents/sly-implementer.toml",
+                    ".codex/agents/sly-reviewer.toml"]:
             self.assertTrue((p.root / rel).is_file(), rel)
         self.assertEqual((p.root / "CLAUDE.md").read_text(), "@AGENTS.md\n")
         result = p.check()
@@ -363,9 +366,9 @@ class AutoRefreshTests(unittest.TestCase):
         (self.root / ".sly/STANDARDS.md").write_text("old")
         hooks = json.loads((SLY / "hooks/hooks.json").read_text())
         command = hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"]
-        command = command.replace("${CLAUDE_PROJECT_DIR}", str(self.root)) \
-                         .replace("${CLAUDE_PLUGIN_ROOT}", str(SLY))
-        result = subprocess.run(["sh", "-c", command], capture_output=True, text=True)
+        env = dict(os.environ, CLAUDE_PROJECT_DIR=str(self.root), CLAUDE_PLUGIN_ROOT=str(SLY))
+        result = subprocess.run(["sh", "-c", command], env=env, cwd=tempfile.gettempdir(),
+                                capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("refreshed", result.stdout)
 
@@ -400,6 +403,51 @@ class CleanupProgressTests(unittest.TestCase):
         result = p.check()
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("Cleanup in progress: 2 of 3 steps done", result.stdout)
+
+
+class CodexPluginTests(unittest.TestCase):
+    """Codex can't be run here, so these check the files Codex reads."""
+
+    def test_manifests_agree(self):
+        claude = json.loads((SLY / ".claude-plugin/plugin.json").read_text())
+        codex = json.loads((SLY / ".codex-plugin/plugin.json").read_text())
+        self.assertEqual(claude["version"], codex["version"])
+        self.assertEqual(codex["name"], "sly")
+        self.assertTrue((SLY / codex["skills"]).is_dir())
+        market = json.loads((SLY / ".agents/plugins/marketplace.json").read_text())
+        self.assertEqual(market["plugins"][0]["source"]["path"], "./")
+
+    def test_skills_are_well_formed_and_point_at_real_files(self):
+        import tomllib
+        skills = sorted((SLY / "codex/skills").glob("*/SKILL.md"))
+        self.assertEqual([s.parent.name for s in skills],
+                         ["sly-build", "sly-checkup", "sly-harden", "sly-start"])
+        for skill in skills:
+            text = skill.read_text()
+            front = text.split("---")[1]
+            self.assertIn(f"name: {skill.parent.name}", front)
+            self.assertIn("description: ", front)
+            for ref in re.findall(r"`\.sly/roles/([a-z]+\.md)`", text):
+                self.assertTrue((SLY / "kit/sly/roles" / ref).is_file(), ref)
+        for agent in (SLY / "kit/codex-agents").glob("*.toml"):
+            data = tomllib.loads(agent.read_text())
+            self.assertEqual(data["name"], agent.stem)
+            self.assertTrue(data["description"] and data["developer_instructions"])
+
+    def test_hooks_work_without_claude_project_dir(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        sh(root, sys.executable, str(INSTALL), ".")
+        (root / ".sly/VERSION").write_text("0.0.1\n")
+        (root / ".sly/STANDARDS.md").write_text("old")
+        hooks = json.loads((SLY / "hooks/hooks.json").read_text())
+        command = hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"]
+        env = {k: v for k, v in os.environ.items() if k != "CLAUDE_PROJECT_DIR"}
+        env["CLAUDE_PLUGIN_ROOT"] = str(SLY)  # Codex sets this for compatibility
+        result = subprocess.run(["sh", "-c", command], cwd=root, env=env,
+                                capture_output=True, text=True)
+        self.assertIn("refreshed", result.stdout, result.stderr)
 
 if __name__ == "__main__":
     unittest.main()

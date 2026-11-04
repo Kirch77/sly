@@ -51,8 +51,19 @@ git clone https://github.com/<you>/sly ~/tools/sly
 This installs the files and has a short conversation with you. The representative writes
 the intent and the map; you just answer a few questions.
 
-Without the plugin (or for Codex), install the files directly, then ask the agent to "set up
-the project following AGENTS.md":
+**In Codex** (same plugin, same repo):
+
+```
+codex plugin marketplace add Kirch77/sly
+```
+
+Then install **sly** from `/plugins`, and trust its hooks when Codex asks (run `/hooks` to
+review them). In a project, type `$sly-start` and a sentence about what you're building. After
+that it works like Claude Code: ask normally, or use `$sly-build`, `$sly-checkup` and
+`$sly-harden` (Codex uses `$` where Claude Code uses `/sly:`).
+
+**Any other agent:** install the files directly, then ask it to "set up the project following
+AGENTS.md":
 
 ```bash
 python3 ~/tools/sly/install.py ~/path/to/project
@@ -121,7 +132,7 @@ docs/
 ```
 
 "Yours" files are never overwritten. With the plugin, sly's own files refresh automatically
-when you open the project in Claude Code. Without it (Codex, other agents), refresh them with:
+when you open the project in Claude Code or Codex. For other agents, refresh them with:
 
 ```bash
 python3 ~/tools/sly/install.py ~/path/to/project --update

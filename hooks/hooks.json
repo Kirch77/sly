@@ -1,5 +1,5 @@
 {
-  "description": "When a session starts, refresh the project's sly files if the plugin is newer. Before Claude finishes, run the sly drift check.",
+  "description": "When a session starts, refresh the project's sly files if the plugin is newer. Before Claude finishes, run the sly drift check. Works in Claude Code and Codex.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "d=\"${CLAUDE_PROJECT_DIR}\"; [ -d \"$d/.sly\" ] || exit 0; command -v python3 >/dev/null || exit 0; python3 \"${CLAUDE_PLUGIN_ROOT}/install.py\" \"$d\" --auto || true",
+            "command": "d=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; [ -d \"$d/.sly\" ] || exit 0; command -v python3 >/dev/null || exit 0; python3 \"${CLAUDE_PLUGIN_ROOT}/install.py\" \"$d\" --auto || true",
             "timeout": 30
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${CLAUDE_PROJECT_DIR}/.sly/check.py\"; [ -f \"$f\" ] || exit 0; command -v python3 >/dev/null || exit 0; exec python3 \"$f\" --hook",
+            "command": "f=\"${CLAUDE_PROJECT_DIR:-$PWD}/.sly/check.py\"; [ -f \"$f\" ] || exit 0; command -v python3 >/dev/null || exit 0; exec python3 \"$f\" --hook",
             "timeout": 60
           }
         ]

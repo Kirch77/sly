@@ -24,5 +24,7 @@ How the roles map to Claude Code:
 - **Reviewer:** start the `sly:reviewer` agent with the goal, the IMPLIED list, the base
   branch, and the implementer's FILES list. Never pass the implementer's reasoning. For small
   changes, review it yourself instead (see "Size the process to the change").
+- **Stronger model:** when "Choosing the helper's model" applies, start the agent with the
+  strongest model available (for example `model: "fable"`).
 - If the implementer replies `BLOCKED:`, decide it yourself unless it triggers "When to ask
   the owner".

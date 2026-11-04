@@ -2,6 +2,11 @@
 
 For the representative, every so often or when the owner asks.
 
+**Large drift?** If the project has drifted far (much of the code doesn't follow one structure,
+logic is duplicated in many places, or a clean map can't be drawn), or `docs/CLEANUP.md` already
+exists, switch to `.sly/roles/rescue.md` instead. Checkups are for keeping a healthy project
+healthy.
+
 1. Run `python3 .sly/check.py --all` for the mechanical part, including older problems and
    oversized files.
 2. Review the whole project, with reviewers on slices if it is large (tell each one it is

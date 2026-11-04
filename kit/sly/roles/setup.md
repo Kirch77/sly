@@ -46,6 +46,7 @@ for the owner: they describe the idea, you do the rest.
 3. **Draft `docs/INTENT.md`** from what you see (README, code, history, existing screens).
 4. **Check in once:** ask the owner to confirm the intent and fill gaps (especially the *why*),
    and tell them the biggest rough spots in plain words, with a recommendation: clean up now,
-   or as you go.
+   or as you go. If the drift is heavy, recommend a rescue (`.sly/roles/rescue.md`): a written
+   plan that brings the code back in safe, ordered steps.
 
 Before the check-in, run `python3 .sly/check.py` and fix what it reports.

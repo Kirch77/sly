@@ -1,7 +1,7 @@
 ---
 name: build
 description: The sly workflow for building, adding, changing or fixing code. The representative turns the request into a brief, the implementer proposes and builds, the reviewer checks with fresh eyes, and the owner gets a plain-words report.
-when_to_use: Use whenever the owner asks to build, add, change, fix or refactor code in a project that has sly set up (it has a .sly/ folder and docs/INTENT.md). Not for questions, explanations or planning-only conversations. Not for projects without sly.
+when_to_use: Use whenever the owner asks to build, add, change, fix or refactor code in a project that has sly set up (it has a .sly/ folder and docs/INTENT.md). Not for questions, explanations or planning-only conversations, not for project-wide cleanups, audits or rescues (sly:checkup handles those), and not for projects without sly.
 argument-hint: "<what you want, in your own words>"
 ---
 

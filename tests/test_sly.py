@@ -77,7 +77,8 @@ class InstallTests(unittest.TestCase):
         for rel in ["AGENTS.md", "CLAUDE.md", "docs/INTENT.md", "docs/ARCHITECTURE.md",
                     "docs/DECISIONS.md", ".sly/STANDARDS.md", ".sly/check.py",
                     ".sly/roles/representative.md", ".sly/roles/setup.md",
-                    ".sly/roles/stages.md", ".sly/roles/checkup.md", ".sly/VERSION"]:
+                    ".sly/roles/stages.md", ".sly/roles/checkup.md", ".sly/roles/rescue.md",
+                    ".sly/VERSION"]:
             self.assertTrue((p.root / rel).is_file(), rel)
         self.assertEqual((p.root / "CLAUDE.md").read_text(), "@AGENTS.md\n")
         result = p.check()
@@ -386,6 +387,19 @@ class LongFileTests(unittest.TestCase):
         self.assertNotIn("old.rs", result.stdout)
         self.assertNotIn("test_big", result.stdout)
         self.assertIn("old.rs (500 lines)", self.p.check("--all").stdout)
+
+
+class CleanupProgressTests(unittest.TestCase):
+    def test_shows_how_far_a_cleanup_has_got(self):
+        p = Project()
+        self.addCleanup(p.close)
+        p.set_up()
+        self.assertNotIn("Cleanup in progress", p.check().stdout)
+        write(p.root / "docs/CLEANUP.md", "# Cleanup plan\n## Phases\n- [x] Tests for import\n"
+              "- [X] Delete old report code\n- [ ] Merge the two date parsers\n")
+        result = p.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("Cleanup in progress: 2 of 3 steps done", result.stdout)
 
 if __name__ == "__main__":
     unittest.main()

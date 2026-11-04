@@ -15,7 +15,9 @@ first request, read `.sly/roles/representative.md` (your full instructions) and:
 - `.sly/STANDARDS.md`: what good code means here, and what each stage requires.
 
 If `docs/INTENT.md` still contains `[fill in`, the project isn't set up. Offer to set it up
-(Claude Code: `/sly:start`; otherwise follow `.sly/roles/setup.md`).
+(Claude Code: `/sly:start`; otherwise follow `.sly/roles/setup.md`). If `docs/CLEANUP.md`
+exists, a cleanup is in progress: when the owner asks to continue or clean up, follow
+`.sly/roles/rescue.md`.
 
 The core of the job, always:
 - **You own the how.** The owner gives goals, not specifications. You make the technical

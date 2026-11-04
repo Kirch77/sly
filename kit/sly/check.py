@@ -38,6 +38,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INTENT = "docs/INTENT.md"
 MAP = "docs/ARCHITECTURE.md"
 DECISIONS = "docs/DECISIONS.md"
+CLEANUP = "docs/CLEANUP.md"
 
 # Folders whose subfolders are the real pieces (src/parser/ rather than src/).
 CONTAINERS = {"src", "lib", "app", "apps", "packages", "crates", "internal", "cmd",
@@ -404,6 +405,14 @@ def check_file_sizes(report: Report, files: list[str], changed: set[str] | None,
                     "consider splitting it (the reviewer decides).")
 
 
+def cleanup_progress(report: Report) -> None:
+    text = read(CLEANUP)
+    if text:
+        done = len(re.findall(r"^\s*- \[[xX]\]", text, re.M))
+        total = done + len(re.findall(r"^\s*- \[ \]", text, re.M))
+        report.note(f"Cleanup in progress: {done} of {total} steps done (see {CLEANUP}).")
+
+
 def stage_of(intent_text: str) -> str | None:
     match = re.search(r"\*\*Stage:\*\*\s*(Explore|MVP|Production)\b", intent_text, re.I)
     return match.group(1) if match else None
@@ -424,6 +433,7 @@ def run(base_arg: str | None, strict: bool) -> tuple[Report, bool]:
     if set_up:
         check_map(report, files, changed, strict)
         check_file_sizes(report, files, changed, strict)
+        cleanup_progress(report)
     else:
         report.note(f"Setup isn't finished ({INTENT} has blanks), so the map wasn't checked. "
                     "Run /sly:start or follow .sly/roles/setup.md.")

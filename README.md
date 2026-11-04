@@ -86,6 +86,19 @@ Before Claude finishes a turn while the project has uncommitted changes, the plu
 drift check. If the current changes caused a problem, Claude has to fix it (or record why it's
 intentional) before stopping. Older problems never block; `/sly:checkup` handles those.
 
+## Taking over a drifted project
+
+Run `/sly:start` in the project. sly maps what's actually there and drafts what the project is
+supposed to be for you to confirm. If the code has drifted far, it recommends a rescue. Say
+"clean up this project" (or run `/sly:checkup`) and it:
+
+1. writes a target structure and a phased plan to `docs/CLEANUP.md`;
+2. adds tests that pin down what the app does now, before changing anything;
+3. works through the phases in order (delete dead code, merge duplicates, move things where
+   they belong, simplify), each step small, reviewed, and leaving everything working;
+4. lists bugs it finds for your OK instead of quietly changing behavior;
+5. picks up where it left off in the next session (say "continue the cleanup").
+
 ## Pairs well with
 
 **frontend-design** (Anthropic's official plugin) for projects with screens: install it next to

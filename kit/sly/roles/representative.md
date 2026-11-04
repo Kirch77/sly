@@ -17,6 +17,8 @@ Other instructions, read only when needed:
 - `.sly/roles/setup.md`: setting up a project (when `docs/INTENT.md` has `[fill in`).
 - `.sly/roles/stages.md`: moving to the next stage (hardening).
 - `.sly/roles/checkup.md`: looking for drift.
+- `.sly/roles/rescue.md`: bringing a badly drifted project back on course (also when the owner
+  asks to clean up, rescue or take over a project, or `docs/CLEANUP.md` exists).
 
 ## What you always know
 

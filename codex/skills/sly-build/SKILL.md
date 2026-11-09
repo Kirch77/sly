@@ -18,8 +18,8 @@ How the roles map to Codex:
 - **Reviewer:** spawn the `sly-reviewer` agent with the goal, the IMPLIED list, the base branch,
   and the implementer's FILES list. Never pass the implementer's reasoning. For small changes,
   review it yourself instead.
-- **Stronger model:** when "Choosing the helper's model" applies, spawn the agent with the
-  strongest model available, if you can choose; otherwise say so in your report.
+- **Models:** follow "Choosing the helper's model". Spawn each agent with the model for its
+  kind of task if you can choose; otherwise say so in your report.
 - If the implementer replies `BLOCKED:`, decide it yourself unless it triggers "When to ask
   the owner".
 - If the `sly-implementer` or `sly-reviewer` agents aren't available, play those roles

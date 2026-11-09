@@ -10,3 +10,4 @@ cleanup is already in progress).
 Use `sly:reviewer` or `Explore` agents in parallel (one per piece or area if the project is
 large) for surveys, telling each one it is reviewing an area, not a change. Make cleanups
 with the `sly:implementer` and `sly:reviewer` agents, as in "Handling a request".
+Choose each agent's model as in "Choosing the helper's model" in `representative.md`.

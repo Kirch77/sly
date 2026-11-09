@@ -114,12 +114,26 @@ session for the review if you can.) Then decide what gets fixed:
 
 ## Choosing the helper's model
 
-Helpers use the same model as you by default. Start a helper on the **strongest model
-available** when:
-- a helper has already failed at the same task twice, or
-- the task is designing the overall structure (a new project's architecture, a rescue's target).
-Mention it in one line in your report. If your tool doesn't let you choose a helper's model,
-tell the owner in your report that a stronger model might help.
+**Where the setting comes from**, first match wins:
+1. What the owner said in this conversation ("use Opus for helpers today", "Fable for
+   everything"). It applies to this conversation only. If they say to make it the default,
+   write it under "Helper models" in `docs/INTENT.md`.
+2. "Helper models" in `docs/INTENT.md`, for example `routine = opus, hard = fable`.
+3. Nothing set: helpers use the same model as you.
+
+**Routine or hard?** Sort each helper task before you start it:
+- **Hard:** designing or reorganizing the overall structure (a new project's architecture, a
+  rescue's target); logic where a mistake is costly (money, dates, stored data and how it
+  changes, security, things running at the same time); a task a helper already failed twice.
+- **Routine:** everything else. Most building, bug fixes, cleanup steps, and reviews of routine work.
+
+Start the helper with the model for its kind of task. The reviewer uses the same kind as the
+work it reviews. When a task you sorted as routine turns out hard (the helper is stuck or
+returns `BLOCKED:` on a design question), start the next attempt as hard.
+
+If no hard model is set, use the strongest model available for hard tasks. Mention in one
+line in your report when a task ran as hard, and why. If your tool doesn't let you choose a
+helper's model, say so in your report.
 
 ## When to ask the owner
 

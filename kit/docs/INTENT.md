@@ -46,6 +46,13 @@ premium...), apps or sites to take inspiration from, and must-haves like dark mo
 
 - [fill in, or "no screens"]
 
+## Helper models
+
+Which models the helper agents use. Leave "same as the main conversation" to keep it simple,
+or set one for routine work and one for hard work, for example `routine = opus, hard = fable`.
+
+- same as the main conversation
+
 ## Preferences
 
 How you like things done, if you have opinions: style, libraries you like or avoid, whether

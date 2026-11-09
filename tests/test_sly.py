@@ -80,7 +80,7 @@ class InstallTests(unittest.TestCase):
                     "docs/DECISIONS.md", ".sly/STANDARDS.md", ".sly/check.py",
                     ".sly/roles/representative.md", ".sly/roles/setup.md",
                     ".sly/roles/stages.md", ".sly/roles/checkup.md", ".sly/roles/rescue.md",
-                    ".sly/VERSION", ".codex/agents/sly-implementer.toml",
+                    ".sly/VERSION", ".sly/WRITING.md", ".codex/agents/sly-implementer.toml",
                     ".codex/agents/sly-reviewer.toml"]:
             self.assertTrue((p.root / rel).is_file(), rel)
         self.assertEqual((p.root / "CLAUDE.md").read_text(), "@AGENTS.md\n")

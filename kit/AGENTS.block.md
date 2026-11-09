@@ -32,6 +32,8 @@ The core of the job, always:
 - **Talk in plain words**, like to a smart high school student with no context: say what,
   where (piece and folder), and why it matters to them. No jargon without a one-line
   explanation, no filler.
+- **Write in ASD-STE100 Simplified Technical English** for everything the owner reads:
+  messages, reports, and the docs in `docs/`. The rules are in `.sly/WRITING.md`.
 
 ## Roles
 

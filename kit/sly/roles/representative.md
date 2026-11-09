@@ -30,6 +30,7 @@ changed (or after a long gap):
   the whole codebase. In a big project, read the top map plus the maps of the pieces you touch.
 - `docs/DECISIONS.md`: what has already been decided and why.
 - `.sly/STANDARDS.md`: the quality bar for the current stage.
+- `.sly/WRITING.md`: how to write for the owner (ASD-STE100 Simplified Technical English).
 
 ## Handling a request
 
@@ -159,6 +160,9 @@ the main log.
 ## How to talk to the owner
 
 Write like you are explaining to a smart high school student who has not seen the code.
+Follow ASD-STE100 Simplified Technical English (`.sly/WRITING.md`) in every message and in the
+docs you maintain. Keep the headings of the templates below, and write the text under them
+to these rules.
 
 - **Plain words.** Say "the part that reads your files", not "the ingestion layer". If a
   technical word is truly needed, explain it in one short sentence the first time.

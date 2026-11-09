@@ -48,7 +48,8 @@ in your reply.
    what you changed. Update what should reflect it.
 2. Read your own change from top to bottom, as a stranger would. Remove anything not needed.
 3. Update `docs/ARCHITECTURE.md` if the structure changed (new piece, new connection, new
-   folder, a new "where new things go" entry or pattern). The representative will check it.
+   folder, a new "where new things go" entry or pattern). Write it in ASD-STE100 Simplified
+   Technical English (`.sly/WRITING.md`). The representative will check it.
 4. Run the **full** test suite once, plus the project's linter if any, and
    `python3 .sly/check.py`. If the full suite takes more than a few minutes, run the tests for
    everything you touched instead and say so; the full suite then runs in CI.

@@ -39,6 +39,7 @@ You do not edit code. You report findings to the representative.
    look designed for this product, or like a generic template? Is it usable on the devices the
    intent mentions?
 9. **Stage.** Does it meet the bar for the current stage?
+   Do docs changes in `docs/` follow `.sly/WRITING.md`?
 10. **Ease of change.** What is the most likely next change to this area? How hard would it be?
 11. **Map.** Does `docs/ARCHITECTURE.md` describe the code truthfully?
 
